@@ -27,6 +27,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 const ICON_SIZE = 18;
 const TOOLTIP_OFFSET = 8;
 const TOOLTIP_ANIMATION_TIME = 150;
+const MAX_SHORTCUT_NUMBER = 9;
 
 function sortWindowsByStableSequence(windowA, windowB) {
     return windowA.get_stable_sequence() - windowB.get_stable_sequence();
@@ -154,15 +155,17 @@ class WindowsInPanelTaskbar extends St.Widget {
 
         const entries = [];
 
-        for (const app of favoriteApps) {
+        favoriteApps.forEach((app, index) => {
             const appWindows = windowsByAppId.get(app.get_id()) ?? [];
+            const shortcutNumber = index + 1;
 
             if (appWindows.length === 0) {
                 entries.push({
                     type: 'launcher',
                     app,
+                    shortcutNumber,
                 });
-                continue;
+                return;
             }
 
             appWindows.forEach(window => {
@@ -170,9 +173,10 @@ class WindowsInPanelTaskbar extends St.Widget {
                     type: 'window',
                     app,
                     window,
+                    shortcutNumber,
                 });
             });
-        }
+        });
 
         for (const window of windows) {
             const app = this._windowTracker.get_window_app(window);
@@ -184,6 +188,7 @@ class WindowsInPanelTaskbar extends St.Widget {
                 type: 'window',
                 app,
                 window,
+                shortcutNumber: null,
             });
         }
 
@@ -201,16 +206,43 @@ class WindowsInPanelTaskbar extends St.Widget {
         });
     }
 
-    _getTooltipText(entry) {
+    _getEntryLabels(entry) {
         const appName = entry.app?.get_name() ?? 'App';
         if (entry.type === 'launcher')
-            return appName;
+            return {
+                accessibleName: appName,
+                tooltipText: appName,
+            };
 
         const windowTitle = entry.window.get_title();
         if (!windowTitle || windowTitle === appName)
-            return appName;
+            return {
+                accessibleName: appName,
+                tooltipText: appName,
+            };
 
-        return `${appName} — ${windowTitle}`;
+        return {
+            accessibleName: windowTitle,
+            tooltipText: `${appName} — ${windowTitle}`,
+        };
+    }
+
+    _createShortcutBadge(entry) {
+        if (!entry.shortcutNumber || entry.shortcutNumber > MAX_SHORTCUT_NUMBER)
+            return null;
+
+        const badge = new St.Label({
+            style_class: 'windows-in-panel-shortcut',
+            text: `${entry.shortcutNumber}`,
+        });
+
+        return new St.Bin({
+            x_expand: true,
+            y_expand: true,
+            x_align: Clutter.ActorAlign.END,
+            y_align: Clutter.ActorAlign.START,
+            child: badge,
+        });
     }
 
     _syncTooltip(button, text) {
@@ -262,13 +294,25 @@ class WindowsInPanelTaskbar extends St.Widget {
             y_align: Clutter.ActorAlign.FILL,
         });
 
+        const content = new St.Widget({
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true,
+            y_expand: true,
+        });
+
         const iconBin = new St.Bin({
             style_class: 'windows-in-panel-icon',
             x_align: Clutter.ActorAlign.CENTER,
             y_align: Clutter.ActorAlign.CENTER,
             child: this._createIcon(entry),
         });
-        button.set_child(iconBin);
+        content.add_child(iconBin);
+
+        const shortcutBadge = this._createShortcutBadge(entry);
+        if (shortcutBadge)
+            content.add_child(shortcutBadge);
+
+        button.set_child(content);
 
         if (entry.type === 'window' && entry.window === focusedWindow)
             button.add_style_class_name('active');
@@ -276,12 +320,10 @@ class WindowsInPanelTaskbar extends St.Widget {
         if (entry.type === 'window' && entry.window.minimized)
             button.add_style_class_name('minimized');
 
-        const label = entry.type === 'launcher'
-            ? entry.app.get_name()
-            : entry.window.get_title() || entry.app?.get_name() || 'Window';
-        button.accessible_name = label;
+        const {accessibleName, tooltipText} = this._getEntryLabels(entry);
+        button.accessible_name = accessibleName;
         button.connect('notify::hover',
-            () => this._syncTooltip(button, this._getTooltipText(entry)));
+            () => this._syncTooltip(button, tooltipText));
 
         button.connect('clicked', () => {
             this._syncTooltip(button, null);

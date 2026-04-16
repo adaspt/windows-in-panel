@@ -1,50 +1,64 @@
 .windows-in-panel-container {
-    min-width: 0;
-    padding: 0 6px;
+  min-width: 0;
+  padding: 0 6px;
 }
 
 .windows-in-panel-box {
-    spacing: 2px;
-    min-width: 0;
+  spacing: 2px;
+  min-width: 0;
 }
 
 .windows-in-panel-button {
-    min-width: 0;
-    padding: 0;
-    margin: 0;
-    border-radius: 8px;
-    background-color: transparent;
-    border: 1px solid transparent;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid transparent;
 }
 
 .windows-in-panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .windows-in-panel-button:active {
-    background-color: rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.14);
 }
 
 .windows-in-panel-button.active {
-    background-color: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .windows-in-panel-button.minimized {
-    opacity: 0.72;
+  opacity: 0.72;
 }
 
 .windows-in-panel-icon {
-    width: 30px;
-    height: 28px;
-    padding: 4px 6px;
+  width: 30px;
+  height: 28px;
+  padding: 4px 6px;
 }
 
 .windows-in-panel-fallback-icon {
-    icon-size: 18px;
+  icon-size: 18px;
+}
+
+.windows-in-panel-shortcut {
+  min-width: 16px;
+  min-height: 16px;
+  margin: 2px 2px 0 0;
+  padding: 0;
+  border-radius: 8px;
+  background-color: rgba(18, 18, 18, 0.64);
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: none;
 }
 
 .windows-in-panel-tooltip {
-    max-width: 420px;
-    padding: 6px 10px;
+  max-width: 420px;
+  padding: 6px 10px;
 }
