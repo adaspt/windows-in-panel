@@ -1,0 +1,6 @@
+{
+  "name": "Windows in panel",
+  "description": "Show open windows and favorite apps in panel",
+  "uuid": "windows-in-panel@adaspt",
+  "shell-version": ["49"]
+}

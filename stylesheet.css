@@ -1,0 +1,45 @@
+.windows-in-panel-container {
+    min-width: 0;
+    padding: 0 6px;
+}
+
+.windows-in-panel-box {
+    spacing: 2px;
+    min-width: 0;
+}
+
+.windows-in-panel-button {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border-radius: 8px;
+    background-color: transparent;
+    border: 1px solid transparent;
+}
+
+.windows-in-panel-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.windows-in-panel-button:active {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.windows-in-panel-button.active {
+    background-color: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.windows-in-panel-button.minimized {
+    opacity: 0.72;
+}
+
+.windows-in-panel-icon {
+    width: 30px;
+    height: 28px;
+    padding: 4px 6px;
+}
+
+.windows-in-panel-fallback-icon {
+    icon-size: 18px;
+}
