@@ -245,6 +245,25 @@ class WindowsInPanelTaskbar extends St.Widget {
         });
     }
 
+    _createRunningIndicator(entry, focusedWindow) {
+        if (entry.type !== 'window' || entry.window === focusedWindow)
+            return null;
+
+        const indicator = new St.Widget({
+            style_class: 'windows-in-panel-running-indicator',
+            width: 12,
+            height: 2,
+        });
+
+        return new St.Bin({
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.END,
+            x_expand: true,
+            y_expand: true,
+            child: indicator,
+        });
+    }
+
     _syncTooltip(button, text) {
         if (!button.hover || !text) {
             this._tooltip.ease({
@@ -311,6 +330,10 @@ class WindowsInPanelTaskbar extends St.Widget {
         const shortcutBadge = this._createShortcutBadge(entry);
         if (shortcutBadge)
             content.add_child(shortcutBadge);
+
+        const runningIndicator = this._createRunningIndicator(entry, focusedWindow);
+        if (runningIndicator)
+            content.add_child(runningIndicator);
 
         button.set_child(content);
 

@@ -58,6 +58,14 @@
   text-shadow: none;
 }
 
+.windows-in-panel-running-indicator {
+  width: 12px;
+  height: 2px;
+  margin-bottom: 2px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
 .windows-in-panel-tooltip {
   max-width: 420px;
   padding: 6px 10px;
