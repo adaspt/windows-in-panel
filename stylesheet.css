@@ -43,3 +43,8 @@
 .windows-in-panel-fallback-icon {
     icon-size: 18px;
 }
+
+.windows-in-panel-tooltip {
+    max-width: 420px;
+    padding: 6px 10px;
+}

@@ -25,6 +25,8 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const ICON_SIZE = 18;
+const TOOLTIP_OFFSET = 8;
+const TOOLTIP_ANIMATION_TIME = 150;
 
 function sortWindowsByStableSequence(windowA, windowB) {
     return windowA.get_stable_sequence() - windowB.get_stable_sequence();
@@ -47,6 +49,11 @@ class WindowsInPanelTaskbar extends St.Widget {
         this._windowTracker = Shell.WindowTracker.get_default();
         this._signalIds = [];
         this._windowSignalIds = new Map();
+        this._tooltip = new St.Label({
+            style_class: 'dash-label windows-in-panel-tooltip',
+            visible: false,
+        });
+        Main.uiGroup.add_child(this._tooltip);
 
         this._box = new St.BoxLayout({
             style_class: 'windows-in-panel-box',
@@ -194,6 +201,57 @@ class WindowsInPanelTaskbar extends St.Widget {
         });
     }
 
+    _getTooltipText(entry) {
+        const appName = entry.app?.get_name() ?? 'App';
+        if (entry.type === 'launcher')
+            return appName;
+
+        const windowTitle = entry.window.get_title();
+        if (!windowTitle || windowTitle === appName)
+            return appName;
+
+        return `${appName} — ${windowTitle}`;
+    }
+
+    _syncTooltip(button, text) {
+        if (!button.hover || !text) {
+            this._tooltip.ease({
+                opacity: 0,
+                duration: TOOLTIP_ANIMATION_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                onComplete: () => (this._tooltip.visible = false),
+            });
+            return;
+        }
+
+        this._tooltip.remove_all_transitions();
+        this._tooltip.set({
+            text,
+            visible: true,
+            opacity: 0,
+        });
+
+        const [stageX, stageY] = button.get_transformed_position();
+        const [buttonWidth, buttonHeight] = button.get_transformed_size();
+        const [tipWidth, tipHeight] = this._tooltip.get_size();
+        const xOffset = Math.floor((buttonWidth - tipWidth) / 2);
+        const monitor = Main.layoutManager.findMonitorForActor(button);
+        const x = Math.clamp(
+            stageX + xOffset,
+            monitor.x,
+            monitor.x + monitor.width - tipWidth);
+        const y = stageY - monitor.y > tipHeight + TOOLTIP_OFFSET
+            ? stageY - tipHeight - TOOLTIP_OFFSET
+            : stageY + buttonHeight + TOOLTIP_OFFSET;
+
+        this._tooltip.set_position(x, y);
+        this._tooltip.ease({
+            opacity: 255,
+            duration: TOOLTIP_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        });
+    }
+
     _createButton(entry, focusedWindow) {
         const button = new St.Button({
             style_class: 'panel-button windows-in-panel-button',
@@ -222,8 +280,11 @@ class WindowsInPanelTaskbar extends St.Widget {
             ? entry.app.get_name()
             : entry.window.get_title() || entry.app?.get_name() || 'Window';
         button.accessible_name = label;
+        button.connect('notify::hover',
+            () => this._syncTooltip(button, this._getTooltipText(entry)));
 
         button.connect('clicked', () => {
+            this._syncTooltip(button, null);
             if (entry.type === 'launcher')
                 entry.app.open_new_window(-1);
             else
@@ -240,6 +301,7 @@ class WindowsInPanelTaskbar extends St.Widget {
         const focusedWindow = global.display.focus_window;
         const entries = this._buildEntries(windows);
 
+        this._syncTooltip(this, null);
         this._box.destroy_all_children();
 
         for (const entry of entries)
@@ -256,6 +318,7 @@ class WindowsInPanelTaskbar extends St.Widget {
             signalIds.forEach(signalId => window.disconnect(signalId));
         }
         this._windowSignalIds.clear();
+        this._tooltip.destroy();
     }
 });
 
