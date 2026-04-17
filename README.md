@@ -13,6 +13,7 @@ The extension is designed to make open windows easier to reach without leaving t
 ## How it works
 
 The taskbar is inserted into the left side of the top panel, right after the Activities button.
+The clock and calendar menu (`dateMenu`) are moved from the center section of the panel to the right side while the extension is enabled.
 
 Each panel item is represented by the application icon:
 
