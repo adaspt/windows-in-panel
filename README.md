@@ -9,11 +9,13 @@ It shows:
 - favorite apps first, then non-favorite running apps
 
 The extension is designed to make open windows easier to reach without leaving the panel or opening the overview.
+It also hides the GNOME overview after shell startup so the normal desktop is shown immediately.
 
 ## How it works
 
 The taskbar is inserted into the left side of the top panel, right after the Activities button.
 The clock and calendar menu (`dateMenu`) are moved from the center section of the panel to the right side while the extension is enabled.
+After GNOME Shell startup completes, the extension hides the overview so the session opens on the desktop instead of overview mode.
 
 Each panel item is represented by the application icon:
 

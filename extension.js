@@ -390,6 +390,12 @@ export default class WindowsInPanelExtension extends Extension {
   enable() {
     this._taskbar = new WindowsInPanelTaskbar();
 
+    Main.layoutManager.connectObject(
+      "startup-complete",
+      () => this._hideOverviewOnStartup(),
+      this,
+    );
+
     this._moveDateMenu(true);
 
     const leftBox = Main.panel._leftBox;
@@ -400,9 +406,14 @@ export default class WindowsInPanelExtension extends Extension {
   }
 
   disable() {
+    Main.layoutManager.disconnectObject(this);
     this._taskbar?.destroy();
     this._taskbar = null;
     this._moveDateMenu(false);
+  }
+
+  _hideOverviewOnStartup() {
+    Main.overview.hide();
   }
 
   _moveDateMenu(active) {
