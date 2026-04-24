@@ -2,6 +2,8 @@
 
 `Windows in Panel` is a GNOME Shell extension that places a compact taskbar directly in the top panel.
 
+Supported GNOME Shell versions: `49` and `50`.
+
 It shows:
 
 - favorite applications from the GNOME dash
